@@ -340,4 +340,122 @@ async function copyCode(){
 async function joinRoom(){
   if(!user){notify("Sign in before joining a room.");showAuth();return;}
   const joinCode=document.getElementById("joinCode").value.trim().toUpperCase();
-  if(!join
+  if(!joinCode)return notify("Enter a room code.");
+  try{
+    const {data,error}=await db.from("game_rooms").select("*").eq("join_code",joinCode).maybeSingle();
+    if(error)throw error;
+    if(!data)throw Error("Room not found. Check the code with your friend.");
+    if(data.status==="finished")throw Error("This room has finished.");
+    room=data;await addMember(room.id);renderRoom();notify("You joined "+room.room_name+"!");
+  }catch(e){notify(e.message||"Could not join room.");}
+}
+async function addMember(roomId){
+  if(!user)return;
+  const {error}=await db.from("game_room_members").upsert({room_id:roomId,user_id:user.id,score:0},{onConflict:"room_id,user_id",ignoreDuplicates:true});
+  if(error)console.warn("Membership:",error.message);
+}
+function renderRoom(){
+  if(!room)return;
+  document.getElementById("currentRoom").innerHTML=<div class="listrow"><div><strong>${safe(room.room_name)}</strong><div class="small">Code: ${safe(room.join_code)} · ${safe(titles[room.game_type]||room.game_type)}</div></div><button onclick="play('${safe(room.game_type)}')">Play →</button></div>;
+}
+async function loadCounts(){
+  const [r,p]=await Promise.all([
+    db.from("game_rooms").select("*",{count:"exact",head:true}).neq("status","finished"),
+    db.from("game_profiles").select("*",{count:"exact",head:true})
+  ]);
+  document.getElementById("roomCount").textContent=r.error?"—":(r.count??0);
+  document.getElementById("playerCount").textContent=p.error?"—":(p.count??0);
+}
+async function loadLeaderboard(){
+  const el=document.getElementById("leaderboard");
+  if(!user){el.textContent="Sign in to see scores.";return;}
+  try{
+    const {data:members,error}=await db.from("game_room_members").select("user_id,score").order("score",{ascending:false}).limit(100);
+    if(error)throw error;
+    if(!members?.length){el.innerHTML='<p class="muted">No scores yet. Play a game to get started!</p>';return;}
+    const totals={};members.forEach(m=>totals[m.user_id]=(totals[m.user_id]||0)+(Number(m.score)||0));
+    const ids=Object.keys(totals).sort((a,b)=>totals[b]-totals[a]).slice(0,8);
+    const {data:people,error:e2}=await db.from("game_profiles").select("user_id,display_name,username").in("user_id",ids);
+    if(e2)throw e2;
+    const byId=Object.fromEntries((people||[]).map(p=>[p.user_id,p]));
+    el.innerHTML=ids.map((id,i)=><div class="listrow"><div><strong>${i+1}. ${safe(byId[id]?.display_name||byId[id]?.username||"Player")}</strong><div class="small">@${safe(byId[id]?.username||"player")}</div></div><strong>${totals[id]} pts</strong></div>).join("");
+  }catch(e){el.innerHTML=<p class="muted">Leaderboard couldn't load: ${safe(e.message)}</p>;}
+}
+async function play(type){
+  if(!user){notify("Sign in to play and save your score.");showAuth();return;}
+  gameType=type;
+  try{
+    const {data,error}=await db.from("game_questions").select("id,game_type,question,option_a,option_b,difficulty").eq("game_type",type).limit(60);
+    if(error)throw error;
+    questions=(data||[]).filter(q=>q.question);
+    if(!questions.length)questions=(prompts[type]||prompts.random_chaos).map((q,i)=>({id:null,game_type:type,question:q[0],option_a:q[1],option_b:q[2],fallback_index:i}));
+    questions.sort(()=>Math.random()-.5);
+    if(!room){
+      const {data:newRoom,error:roomError}=await db.from("game_rooms").insert({room_name:${profile?.display_name||"Player"}'s game,join_code:code(),game_type:type,host_id:user.id,status:"playing"}).select("*").single();
+      if(!roomError){room=newRoom;await addMember(room.id);renderRoom();}
+      else console.warn("Couldn't create solo room:",roomError.message);
+    }
+    questionIndex=0;score=0;
+    document.getElementById("gameTitle").textContent=titles[type]||"Friendship game";
+    document.getElementById("gamebox").classList.remove("hidden");
+    showQuestion();
+  }catch(e){notify(e.message||"Could not load game questions.");}
+}
+function showQuestion(){
+  const q=questions[questionIndex];
+  if(!q)return finishGame();
+  document.getElementById("progress").textContent=Question ${questionIndex+1} of ${questions.length};
+  document.getElementById("question").textContent=q.question;
+  document.getElementById("options").innerHTML=<button onclick="answer(0)">${safe(q.option_a||"Option A")}</button><button onclick="answer(1)">${safe(q.option_b||"Option B")}</button>;
+  document.getElementById("feedback").textContent="Choose an option. Keep the dares fun, safe, and respectful.";
+  const next=document.getElementById("next");next.classList.add("hidden");next.textContent="Next question →";next.onclick=nextQuestion;
+}
+async function answer(choice){
+  const q=questions[questionIndex];
+  document.querySelectorAll("#options button").forEach(b=>b.disabled=true);
+  const response=choice===0?(q.option_a||"Option A"):(q.option_b||"Option B");
+  score++;
+  document.getElementById("feedback").textContent=You chose: ${response}. +1 point for playing!;
+  try{
+    if(room&&q.id){
+      const {error}=await db.from("game_answers").insert({room_id:room.id,question_id:q.id,user_id:user.id,answer:response,points:1});
+      if(error)console.warn("Answer wasn't saved:",error.message);
+    }
+    if(room){
+      const {data:member,error}=await db.from("game_room_members").select("score").eq("room_id",room.id).eq("user_id",user.id).maybeSingle();
+      if(!error&&member){
+        const {error:updateError}=await db.from("game_room_members").update({score:(Number(member.score)||0)+1}).eq("room_id",room.id).eq("user_id",user.id);
+        if(updateError)console.warn("Score wasn't updated:",updateError.message);
+      }
+    }
+  }catch(e){console.warn(e);}
+  const next=document.getElementById("next");next.classList.remove("hidden");
+  if(questionIndex===questions.length-1)next.textContent="See results →";
+}
+function nextQuestion(){questionIndex++;if(questionIndex>=questions.length){finishGame();return;}showQuestion();}
+async function finishGame(){
+  document.getElementById("progress").textContent="ROUND COMPLETE";
+  document.getElementById("question").textContent=You earned ${score} points! 🎉;
+  document.getElementById("options").innerHTML="";
+  document.getElementById("feedback").textContent="Invite the squad for another round!";
+  const next=document.getElementById("next");next.classList.remove("hidden");next.textContent="Play again ↻";next.onclick=()=>play(gameType);
+  await loadLeaderboard();await loadCounts();
+}
+function closeGame(){document.getElementById("gamebox").classList.add("hidden");}
+
+db.auth.onAuthStateChange((event,session)=>{
+  if(event==="SIGNED_OUT"){user=null;profile=null;room=null;updateAuthButton();}
+  if(event==="SIGNED_IN"&&session?.user){user=session.user;setTimeout(()=>afterLogin().catch(console.error),0);}
+});
+async function init(){
+  try{
+    const {data,error}=await db.auth.getSession();
+    if(error)throw error;
+    if(data.session?.user){user=data.session.user;await afterLogin();}
+    else{updateAuthButton();await loadCounts();}
+  }catch(e){notify("Supabase connection issue: "+e.message);}
+}
+init();
+</script>
+</body>
+</html>
