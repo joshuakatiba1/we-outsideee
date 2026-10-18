@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151027">
+<title>We Outsideee | Friendship Arena</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#100c20;--panel:#1c1632;--panel2:#28203f;--purple:#b49aff;--pink:#ff78bc;--cyan:#72e7f5;--text:#fffaff;--muted:#bcb3d1;--line:#403451}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top left,#302052,var(--bg) 48%);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:11px 15px;font-weight:750;background:linear-gradient(120deg,var(--purple),#e1c5ff);color:#211331}
+button:hover{filter:brightness(1.08)}
+button:disabled{opacity:.5}
+.secondary{background:var(--panel2);color:white;border:1px solid var(--line)}
+.wrap{max-width:1080px;width:calc(100% - 28px);margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--pink));font-size:24px;color:#20112f}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:19px;margin-bottom:2px}
+.brand small{color:var(--muted);letter-spacing:2px;font-size:10px}
+header button{font-size:12px;padding:10px}
+.hero{padding:48px 0 26px}
+.eyebrow{color:var(--cyan);letter-spacing:2px;text-transform:uppercase;font-size:11px;font-weight:800}
+.hero h2{font-size:clamp(38px,7vw,68px);letter-spacing:-2px;line-height:1.02;margin:14px 0}
+.gradient{background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));background-clip:text;color:transparent}
+.hero p{color:var(--muted);max-width:600px;line-height:1.7}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.stats,.games,.columns{display:grid;gap:13px}
+.stats{grid-template-columns:repeat(3,1fr);margin:16px 0 36px}
+.stat,.panel,.game{border:1px solid var(--line);background:#1b1530eF;border-radius:19px;padding:17px}
+.stat strong{display:block;font-size:24px}.stat span{font-size:12px;color:var(--muted)}
+section{margin:35px 0}
+.heading{margin-bottom:16px}
+.heading h3,.panel h3{font-size:23px;margin-bottom:5px}
+.heading p,.muted{font-size:13px;color:var(--muted);line-height:1.55}
+.games{grid-template-columns:repeat(3,minmax(0,1fr))}
+.game{min-height:205px;display:flex;flex-direction:column;align-items:flex-start;background:linear-gradient(145deg,#29203f,#19132c)}
+.game .emoji{font-size:27px;margin-bottom:10px}
+.game h3{font-size:17px;margin-bottom:7px}
+.game p{font-size:13px;line-height:1.5;color:var(--muted);flex:1}
+.game button{font-size:12px}
+.columns{grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;gap:7px;margin:13px 0}
+.field label{font-size:12px;color:var(--muted)}
+input,select{width:100%;padding:12px;background:#100c20;color:white;border:1px solid var(--line);border-radius:11px}
+.panel>button{margin-top:5px}
+#message{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#f3eaff;color:#211331;padding:12px 17px;border-radius:12px;font-size:13px;font-weight:700;display:none;z-index:10;max-width:90%;box-shadow:0 8px 30px #0008}
+#auth{max-width:480px;margin:28px auto}
+#auth.hidden,.hidden{display:none!important}
+.listrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:#ffffff08;border:1px solid var(--line);border-radius:12px;margin:8px 0}
+.small{font-size:12px;color:var(--muted)}
+#gamebox{position:fixed;inset:0;background:#080511eF;z-index:5;display:grid;place-items:center;padding:14px}
+#gamebox.hidden{display:none}
+.game-modal{width:min(550px,100%);max-height:90vh;overflow:auto;background:#1b1530;border:1px solid var(--line);border-radius:20px;padding:22px}
+.game-modal h2{font-size:25px}
+#question{font-size:23px;line-height:1.35;font-weight:800;margin:22px 0}
+#options{display:grid;gap:10px}
+#options button{text-align:left;background:var(--panel2);color:white;border:1px solid var(--line)}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:12px}
+@media(max-width:700px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.hero{padding-top:32px}}
+@media(max-width:430px){.games{gap:8px}.game{padding:12px;min-height:220px}.game h3{font-size:15px}.game p{font-size:12px}.stats{gap:7px}.stat{padding:11px}.stat strong{font-size:20px}.hero h2{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">✦</div><div><h1>We Outsideee</h1><small>FRIENDSHIP ARENA</small></div></div>
+  <button id="authButton" onclick="showAuth()">Sign in</button>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div class="eyebrow">✦ YOUR SQUAD. YOUR CHAOS.</div>
+  <h2>Friendship is a<br><span class="gradient">competitive sport.</span></h2>
+  <p>Find out who knows you best, expose the group chat secrets, and turn an ordinary hangout into legendary memories.</p>
+  <div class="actions">
+    <button onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">Explore games ↓</button>
+    <button class="secondary" onclick="document.querySelector('#rooms').scrollIntoView({behavior:'smooth'})">Create a room +</button>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat"><strong>06</strong><span>ways to cause chaos</span></div>
+  <div class="stat"><strong id="roomCount">—</strong><span>active rooms</span></div>
+  <div class="stat"><strong id="playerCount">—</strong><span>registered players</span></div>
+</div>
+
+<section id="games">
+  <div class="heading"><h3>Pick your poison 🎲</h3><p>Choose a game and get the squad involved.</p></div>
+  <div class="games">
+    <article class="game"><div class="emoji">🧠</div><h3>Who Knows Me Best?</h3><p>Test how well your friends actually know you.</p><button onclick="play('who_knows_me_best')">Play now →</button></article>
+    <article class="game"><div class="emoji">⚖️</div><h3>Would You Rather</h3><p>Two choices. One questionable personality.</p><button onclick="play('would_you_rather')">Play now →</button></article>
+    <article class="game"><div class="emoji">🫣</div><h3>Truth or Dare</h3><p>Be honest or do something memorable.</p><button onclick="play('truth_or_dare')">Play now →</button></article>
+    <article class="game"><div class="emoji">🙋</div><h3>Never Have I Ever</h3><p>Find out who has been living a double life.</p><button onclick="play('never_have_i_ever')">Play now →</button></article>
+    <article class="game"><div class="emoji">💞</div><h3>Friendship Quiz</h3><p>Questions that put your friendship to the test.</p><button onclick="play('friendship_quiz')">Play now →</button></article>
+    <article class="game"><div class="emoji">🌪️</div><h3>Random Chaos</h3><p>Random prompts for the most unserious friend.</p><button onclick="play('random_chaos')">Play now →</button></article>
+  </div>
+</section>
+
+<section id="rooms">
+  <div class="heading"><h3>Squad lobby 🛋️</h3><p>Create a shared room or join your friend's room using a code.</p></div>
+  <div class="columns">
+    <div class="panel">
+      <h3>Create a room</h3><p class="muted">Sign in first to create a room and share its code.</p>
+      <div class="field"><label>Room name</label><input id="roomName" placeholder="Friday Night Chaos" maxlength="40"></div>
+      <div class="field"><label>Game</label><select id="roomGame">
+        <option value="who_knows_me_best">Who Knows Me Best?</option>
+        <option value="would_you_rather">Would You Rather</option>
+        <option value="truth_or_dare">Truth or Dare</option>
+        <option value="never_have_i_ever">Never Have I Ever</option>
+        <option value="friendship_quiz">Friendship Quiz</option>
+        <option value="random_chaos">Random Chaos</option>
+      </select></div>
+      <button onclick="createRoom()">Create room</button>
+      <div id="createdRoom"></div>
+    </div>
+    <div class="panel">
+      <h3>Join a room</h3><p class="muted">Enter the code your friend shared.</p>
+      <div class="field"><label>Room code</label><input id="joinCode" placeholder="ABC123" maxlength="8" style="text-transform:uppercase"></div>
+      <button class="secondary" onclick="joinRoom()">Join the squad →</button>
+      <div id="currentRoom"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="columns">
+    <div class="panel"><h3>Your player profile 👤</h3><div id="profile" class="muted">Sign in to create your profile.</div></div>
+    <div class="panel"><h3>Leaderboard 🏆</h3><div id="leaderboard" class="muted">Sign in to see scores.</div></div>
+  </div>
+</section>
+</main>
+
+<section id="auth" class="hidden">
+  <div class="panel">
+    <h3 id="authTitle">Welcome back 👋</h3>
+    <p class="muted" id="authDescription">Sign in to enter the arena.</p>
+    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters"></div>
+    <div id="signupFields" class="hidden">
+      <div class="field"><label>Display name</label><input id="displayName" maxlength="30" placeholder="Your name"></div>
+      <div class="field"><label>Username</label><input id="username" maxlength="20" placeholder="chaoscaptain"></div>
+    </div>
+    <button id="authSubmit" onclick="submitAuth()">Sign in</button>
+    <button class="secondary" onclick="toggleAuthMode()" id="switchMode">Create an account</button>
+    <button class="secondary" onclick="hideAuth()">Cancel</button>
+  </div>
+</section>
+
+<footer>© <span id="year"></span> We Outsideee · Friendship Arena · Made for the group chat that never sleeps ✦</footer>
+</div>
+
+<div id="gamebox" class="hidden">
+  <div class="game-modal">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <div><div class="eyebrow">GAME ON</div><h2 id="gameTitle">Friendship game</h2></div>
+      <button class="secondary" onclick="closeGame()">✕</button>
+    </div>
+    <div id="progress" class="small"></div>
+    <div id="question">Loading…</div>
+    <div id="options"></div>
+    <p id="feedback" class="muted"></p>
+    <button id="next" class="hidden" onclick="nextQuestion()">Next question →</button>
+  </div>
+</div>
+<div id="message"></div>
+
+<script>
+/* Public project URL and publishable key. Never put a service_role secret in browser code. */
+const SUPABASE_URL = "https://scacatgawfnwjizhqbyb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_efXxXreBvkuFOZdVh38BMA_DrRYjKzf";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const titles = {
+  who_knows_me_best:"Who Knows Me Best?",
+  would_you_rather:"Would You Rather",
+  truth_or_dare:"Truth or Dare",
+  never_have_i_ever:"Never Have I Ever",
+  friendship_quiz:"Friendship Quiz",
+  random_chaos:"Random Chaos"
+};
+
+const prompts = {
+  who_knows_me_best:[
+    ["What would I choose for a perfect day?","A chill day at home","An unplanned adventure"],
+    ["What is most likely to make me laugh?","Dry sarcasm","Ridiculous memes"],
+    ["What would I do with unexpected money?","Save or invest it","Treat myself and the squad"]
+  ],
+  would_you_rather:[
+    ["Read minds or see 10 minutes into the future?","Read minds","See the future"],
+    ["Unlimited free food or unlimited free travel?","Free food","Free travel"],
+    ["Be famous online or quietly wealthy?","Famous online","Quietly wealthy"],
+    ["Always be 10 minutes late or 20 minutes early?","10 minutes late","20 minutes early"]
+  ],
+  truth_or_dare:[
+    ["TRUTH: What was your first impression of someone here?","Tell the truth","Pass this one"],
+    ["DARE: Give someone a dramatic compliment.","Do the dare","Pass this one"],
+    ["TRUTH: What is a harmless secret talent you have?","Share it","Pass this one"],
+    ["DARE: Do your best impression of someone famous.","Do the dare","Pass this one"]
+  ],
+  never_have_i_ever:[
+    ["Never have I ever sent a message to the wrong chat.","Guilty 🙈","Never me"],
+    ["Never have I ever pretended to be asleep to avoid a call.","Guilty 😅","Not me"],
+    ["Never have I ever laughed at a serious moment.","Absolutely","I have self-control"],
+    ["Never have I ever stalked a profile before meeting someone.","Caught me","No comment"]
+  ],
+  friendship_quiz:[
+    ["What matters most in a friendship?","Honesty","Showing up"],
+    ["How should friends handle disagreements?","Talk directly","Take time, then talk"],
+    ["Which squad plan sounds best?","Planned day out","Spontaneous adventure"],
+    ["What makes a friendship last?","Trust and respect","Shared memories"]
+  ],
+  random_chaos:[
+    ["Everyone point to the person most likely to become famous.","Point and explain","I'm staying out of this"],
+    ["Give the group a five-second motivational speech.","Let's gooo!","Pass the microphone"],
+    ["Describe your mood using a movie title.","Give your title","Skip this one"],
+    ["Who would survive longest on a deserted island?","Vote and explain","No comment"]
+  ]
+};
+
+let user=null, profile=null, room=null, gameType=null, questions=[], questionIndex=0, score=0, signupMode=false;
+document.getElementById("year").textContent=new Date().getFullYear();
+
+function notify(text){
+  const el=document.getElementById("message");
+  el.textContent=text;el.style.display="block";
+  clearTimeout(window.msgTimer);
+  window.msgTimer=setTimeout(()=>el.style.display="none",4000);
+}
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function showAuth(){document.getElementById("auth").classList.remove("hidden");document.getElementById("auth").scrollIntoView({behavior:"smooth"});}
+function hideAuth(){document.getElementById("auth").classList.add("hidden");}
+function toggleAuthMode(){
+  signupMode=!signupMode;
+  document.getElementById("signupFields").classList.toggle("hidden",!signupMode);
+  document.getElementById("authTitle").textContent=signupMode?"Join the squad ✨":"Welcome back 👋";
+  document.getElementById("authDescription").textContent=signupMode?"Create your player account.":"Sign in to enter the arena.";
+  document.getElementById("authSubmit").textContent=signupMode?"Create account":"Sign in";
+  document.getElementById("switchMode").textContent=signupMode?"I already have an account":"Create an account";
+}
+function updateAuthButton(){
+  const b=document.getElementById("authButton");
+  b.textContent=user?(profile?.display_name||user.email.split("@")[0]):"Sign in";
+  b.onclick=user?()=>document.getElementById("profile").scrollIntoView({behavior:"smooth"}):showAuth;
+}
+async function submitAuth(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  if(!email||password.length<6)return notify("Enter your email and a password with at least 6 characters.");
+  const b=document.getElementById("authSubmit");b.disabled=true;
+  try{
+    if(signupMode){
+      const display=document.getElementById("displayName").value.trim()||email.split("@")[0];
+      const username=(document.getElementById("username").value.trim()||email.split("@")[0]).toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
+      if(!username)throw Error("Choose a valid username.");
+      const {data,error}=await db.auth.signUp({email,password,options:{data:{display_name:display,username}}});
+      if(error)throw error;
+      if(data.session){
+        user=data.user;await saveProfile(display,username);await afterLogin();
+        notify("Account created. Welcome to the arena!");
+      }else{
+        notify("Account created! Check your email to confirm it, then sign in.");
+        toggleAuthMode();
+      }
+    }else{
+      const {data,error}=await db.auth.signInWithPassword({email,password});
+      if(error)throw error;
+      user=data.user;await afterLogin();notify("You're in. Let's play!");
+    }
+  }catch(e){notify(e.message||"Authentication failed.");}
+  finally{b.disabled=false;}
+}
+async function saveProfile(display,username){
+  if(!user)return;
+  const {error}=await db.from("game_profiles").upsert({
+    user_id:user.id,display_name:display,username:username
+  },{onConflict:"user_id"});
+  if(error)console.warn("Profile save:",error.message);
+}
+async function afterLogin(){
+  hideAuth();
+  await loadProfile();
+  await loadCounts();
+  await loadLeaderboard();
+  updateAuthButton();
+}
+async function loadProfile(){
+  if(!user)return;
+  const {data,error}=await db.from("game_profiles").select("*").eq("user_id",user.id).maybeSingle();
+  if(error)console.warn(error.message);
+  profile=data||{display_name:user.user_metadata?.display_name||user.email.split("@")[0],username:user.user_metadata?.username||user.email.split("@")[0]};
+  document.getElementById("profile").innerHTML=
+    `<div class="listrow"><div><strong>${safe(profile.display_name)}</strong><div class="small">@${safe(profile.username)}</div></div><button class="secondary" onclick="editProfile()">Edit</button></div>
+    <p class="small">Signed in as ${safe(user.email)}</p><button class="secondary" onclick="signOut()">Sign out</button>`;
+}
+async function editProfile(){
+  const display=prompt("Display name:",profile?.display_name||"");if(display===null)return;
+  const username=prompt("Username:",profile?.username||"");if(username===null)return;
+  const clean=username.trim().toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
+  if(!clean)return notify("Enter a valid username.");
+  const {error}=await db.from("game_profiles").upsert({user_id:user.id,display_name:display.trim()||clean,username:clean},{onConflict:"user_id"});
+  if(error)return notify(error.message);
+  await loadProfile();await loadLeaderboard();updateAuthButton();notify("Profile updated.");
+}
+async function signOut(){
+  await db.auth.signOut();user=null;profile=null;room=null;
+  document.getElementById("profile").textContent="Sign in to create your profile.";
+  document.getElementById("leaderboard").textContent="Sign in to see scores.";
+  document.getElementById("currentRoom").innerHTML="";
+  updateAuthButton();notify("Signed out.");
+}
+function code(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join("");}
+async function createRoom(){
+  if(!user){notify("Sign in before creating a room.");showAuth();return;}
+  const name=document.getElementById("roomName").value.trim()||${profile?.display_name||"Squad"}'s room;
+  const type=document.getElementById("roomGame").value;
+  try{
+    let data,error;
+    for(let i=0;i<4;i++){
+      ({data,error}=await db.from("game_rooms").insert({room_name:name,join_code:code(),game_type:type,host_id:user.id,status:"waiting"}).select("*").single());
+      if(!error)break;
+      if(!/duplicate|unique/i.test(error.message))throw error;
+    }
+    if(error)throw error;
+    room=data;
+    await addMember(room.id);
+    document.getElementById("createdRoom").innerHTML=<div class="listrow"><div><div class="small">SHARE THIS CODE</div><strong style="font-size:23px;letter-spacing:3px">${safe(room.join_code)}</strong></div><button onclick="copyCode()">Copy</button></div>;
+    renderRoom();await loadCounts();notify("Room created! Share the code with your friends.");
+  }catch(e){notify(e.message||"Could not create room.");}
+}
+async function copyCode(){
+  if(!room)return;
+  try{await navigator.clipboard.writeText(room.join_code);notify("Room code copied!");}
+  catch{prompt("Copy your room code:",room.join_code);}
+}
+async function joinRoom(){
+  if(!user){notify("Sign in before joining a room.");showAuth();return;}
+  const joinCode=document.getElementById("joinCode").value.trim().toUpperCase();
+  if(!join
