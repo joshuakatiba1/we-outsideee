@@ -210,9 +210,7 @@ input,select {
 
 #auth .panel { padding:22px; }
 
-#auth button {
-  margin:5px 5px 0 0;
-}
+#auth button { margin:5px 5px 0 0; }
 
 .listrow {
   display:flex;
@@ -331,7 +329,6 @@ footer {
     <h3>Pick your poison 🎲</h3>
     <p>Choose a game and get the squad involved.</p>
   </div>
-
   <div class="games">
     <article class="game"><div class="emoji">🧠</div><h3>Who Knows Me Best?</h3><p>Test how well your friends actually know you.</p><button type="button" onclick="play('who_knows_me_best')">Play now →</button></article>
     <article class="game"><div class="emoji">⚖️</div><h3>Would You Rather</h3><p>Two choices. One questionable personality.</p><button type="button" onclick="play('would_you_rather')">Play now →</button></article>
@@ -347,7 +344,6 @@ footer {
     <h3>Squad lobby 🛋️</h3>
     <p>Create a shared room or join your friend's room using a code.</p>
   </div>
-
   <div class="columns">
     <div class="panel">
       <h3>Create a room</h3>
@@ -367,7 +363,6 @@ footer {
       <button type="button" onclick="createRoom()">Create room</button>
       <div id="createdRoom"></div>
     </div>
-
     <div class="panel">
       <h3>Join a room</h3>
       <p class="muted">Enter the code your friend shared.</p>
@@ -396,18 +391,15 @@ footer {
   <div class="panel">
     <h3 id="authTitle">Welcome back 👋</h3>
     <p class="muted" id="authDescription">Sign in to enter the arena.</p>
-
     <form id="authForm">
       <div class="field">
         <label for="email">Email</label>
         <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
       </div>
-
       <div class="field">
         <label for="password">Password</label>
         <input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
       </div>
-
       <div id="signupFields" class="hidden">
         <div class="field">
           <label for="displayName">Display name</label>
@@ -418,7 +410,6 @@ footer {
           <input id="username" maxlength="20" placeholder="chaoscaptain" autocomplete="username">
         </div>
       </div>
-
       <button id="authSubmit" type="submit">Sign in</button>
       <button class="secondary" type="button" id="switchMode">Create an account</button>
       <button class="secondary" type="button" id="cancelAuth">Cancel</button>
@@ -450,7 +441,6 @@ footer {
 <script>
 "use strict";
 
-/* Existing Supabase project: use only the public publishable key in browser code. */
 const SUPABASE_URL = "https://scacatgawfnwjizhqbyb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_efXxXreBvkuFOZdVh38BMA_DrRYjKzf";
 
@@ -513,7 +503,6 @@ const prompts = {
   ]
 };
 
-/* General helpers */
 function $(id) {
   return document.getElementById(id);
 }
@@ -547,7 +536,7 @@ function requireDatabase() {
   return true;
 }
 
-/* SIGN-IN FIX: use a direct event listener instead of inline onclick. */
+/* Authentication panel */
 function showAuth() {
   const section = $("auth");
   if (!section) {
@@ -586,24 +575,16 @@ function toggleAuthMode() {
 function updateAuthButton() {
   const button = $("authButton");
 
-  if (user) {
-    button.textContent =
-      profile?.display_name ||
-      user.email?.split("@")[0] ||
-      "My profile";
-    button.onclick = () => $("profile").scrollIntoView({ behavior:"smooth" });
-  } else {
-    button.textContent = "Sign in";
-    button.onclick = showAuth;
-  }
+  button.textContent = user
+    ? (profile?.display_name || user.email?.split("@")[0] || "My profile")
+    : "Sign in";
 }
 
 /* Authentication */
 async function submitAuth(event) {
-  if (event) event.preventDefault();
+  event.preventDefault();
 
-  if (authBusy) return;
-  if (!requireDatabase()) return;
+  if (authBusy || !requireDatabase()) return;
 
   const email = $("email").value.trim();
   const password = $("password").value;
@@ -620,9 +601,7 @@ async function submitAuth(event) {
 
   try {
     if (signupMode) {
-      const display =
-        $("displayName").value.trim() || email.split("@")[0];
-
+      const display = $("displayName").value.trim() || email.split("@")[0];
       const username = (
         $("username").value.trim() || email.split("@")[0]
       ).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
@@ -649,8 +628,8 @@ async function submitAuth(event) {
         notify("Account created. Welcome to the arena!");
       } else {
         notify("Account created! Check your email to confirm it, then sign in.");
-        if (!signupMode) toggleAuthMode();
-        else toggleAuthMode();
+        signupMode = true;
+        toggleAuthMode();
       }
     } else {
       const { data, error } = await db.auth.signInWithPassword({
@@ -1148,13 +1127,11 @@ function closeGame() {
   $("gamebox").classList.add("hidden");
 }
 
-/* Start the app only after the page has loaded. */
+/* Initialise the website once the page has loaded. */
 async function init() {
   $("year").textContent = new Date().getFullYear();
 
-  /* Attach sign-in handlers directly and explicitly. */
-  $("authButton").addEventListener("click", function(event) {
-    event.preventDefault();
+  $("authButton").addEventListener("click", () => {
     if (user) {
       $("profile").scrollIntoView({ behavior:"smooth" });
     } else {
@@ -1181,7 +1158,6 @@ async function init() {
 
   if (!window.supabase?.createClient) {
     notify("Supabase failed to load. Check your internet connection and refresh.");
-    $("authButton").disabled = false;
     return;
   }
 
@@ -1194,6 +1170,8 @@ async function init() {
         profile = null;
         room = null;
         updateAuthButton();
+        $("profile").textContent = "Sign in to create your profile.";
+        $("leaderboard").textContent = "Sign in to see scores.";
       }
 
       if (event === "SIGNED_IN" && session?.user) {
