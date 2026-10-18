@@ -5,71 +5,308 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#151027">
 <title>We Outsideee | Friendship Arena</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--bg:#100c20;--panel:#1c1632;--panel2:#28203f;--purple:#b49aff;--pink:#ff78bc;--cyan:#72e7f5;--text:#fffaff;--muted:#bcb3d1;--line:#403451}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at top left,#302052,var(--bg) 48%);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
-button,input,select{font:inherit}
-button{cursor:pointer;border:0;border-radius:12px;padding:11px 15px;font-weight:750;background:linear-gradient(120deg,var(--purple),#e1c5ff);color:#211331}
-button:hover{filter:brightness(1.08)}
-button:disabled{opacity:.5}
-.secondary{background:var(--panel2);color:white;border:1px solid var(--line)}
-.wrap{max-width:1080px;width:calc(100% - 28px);margin:auto}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:11px}
-.logo{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--pink));font-size:24px;color:#20112f}
-h1,h2,h3,p{margin-top:0}
-h1{font-size:19px;margin-bottom:2px}
-.brand small{color:var(--muted);letter-spacing:2px;font-size:10px}
-header button{font-size:12px;padding:10px}
-.hero{padding:48px 0 26px}
-.eyebrow{color:var(--cyan);letter-spacing:2px;text-transform:uppercase;font-size:11px;font-weight:800}
-.hero h2{font-size:clamp(38px,7vw,68px);letter-spacing:-2px;line-height:1.02;margin:14px 0}
-.gradient{background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));background-clip:text;color:transparent}
-.hero p{color:var(--muted);max-width:600px;line-height:1.7}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
-.stats,.games,.columns{display:grid;gap:13px}
-.stats{grid-template-columns:repeat(3,1fr);margin:16px 0 36px}
-.stat,.panel,.game{border:1px solid var(--line);background:#1b1530eF;border-radius:19px;padding:17px}
-.stat strong{display:block;font-size:24px}.stat span{font-size:12px;color:var(--muted)}
-section{margin:35px 0}
-.heading{margin-bottom:16px}
-.heading h3,.panel h3{font-size:23px;margin-bottom:5px}
-.heading p,.muted{font-size:13px;color:var(--muted);line-height:1.55}
-.games{grid-template-columns:repeat(3,minmax(0,1fr))}
-.game{min-height:205px;display:flex;flex-direction:column;align-items:flex-start;background:linear-gradient(145deg,#29203f,#19132c)}
-.game .emoji{font-size:27px;margin-bottom:10px}
-.game h3{font-size:17px;margin-bottom:7px}
-.game p{font-size:13px;line-height:1.5;color:var(--muted);flex:1}
-.game button{font-size:12px}
-.columns{grid-template-columns:1fr 1fr}
-.field{display:flex;flex-direction:column;gap:7px;margin:13px 0}
-.field label{font-size:12px;color:var(--muted)}
-input,select{width:100%;padding:12px;background:#100c20;color:white;border:1px solid var(--line);border-radius:11px}
-.panel>button{margin-top:5px}
-#message{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#f3eaff;color:#211331;padding:12px 17px;border-radius:12px;font-size:13px;font-weight:700;display:none;z-index:10;max-width:90%;box-shadow:0 8px 30px #0008}
-#auth{max-width:480px;margin:28px auto}
-#auth.hidden,.hidden{display:none!important}
-.listrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:#ffffff08;border:1px solid var(--line);border-radius:12px;margin:8px 0}
-.small{font-size:12px;color:var(--muted)}
-#gamebox{position:fixed;inset:0;background:#080511eF;z-index:5;display:grid;place-items:center;padding:14px}
-#gamebox.hidden{display:none}
-.game-modal{width:min(550px,100%);max-height:90vh;overflow:auto;background:#1b1530;border:1px solid var(--line);border-radius:20px;padding:22px}
-.game-modal h2{font-size:25px}
-#question{font-size:23px;line-height:1.35;font-weight:800;margin:22px 0}
-#options{display:grid;gap:10px}
-#options button{text-align:left;background:var(--panel2);color:white;border:1px solid var(--line)}
-footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:12px}
-@media(max-width:700px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.hero{padding-top:32px}}
-@media(max-width:430px){.games{gap:8px}.game{padding:12px;min-height:220px}.game h3{font-size:15px}.game p{font-size:12px}.stats{gap:7px}.stat{padding:11px}.stat strong{font-size:20px}.hero h2{font-size:42px}}
+:root {
+  --bg:#100c20;
+  --panel:#1c1632;
+  --panel2:#28203f;
+  --purple:#b49aff;
+  --pink:#ff78bc;
+  --cyan:#72e7f5;
+  --text:#fffaff;
+  --muted:#bcb3d1;
+  --line:#403451;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:radial-gradient(ellipse at top left,#302052,var(--bg) 48%);
+  color:var(--text);
+  font-family:system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+}
+
+button,input,select { font:inherit; }
+
+button {
+  cursor:pointer;
+  border:0;
+  border-radius:12px;
+  padding:11px 15px;
+  font-weight:750;
+  background:linear-gradient(120deg,var(--purple),#e1c5ff);
+  color:#211331;
+}
+
+button:hover { filter:brightness(1.08); }
+button:disabled { opacity:.5;cursor:not-allowed; }
+
+.secondary {
+  background:var(--panel2);
+  color:white;
+  border:1px solid var(--line);
+}
+
+.wrap {
+  max-width:1080px;
+  width:calc(100% - 28px);
+  margin:auto;
+}
+
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:20px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.brand { display:flex;align-items:center;gap:11px; }
+
+.logo {
+  width:43px;
+  height:43px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  font-size:24px;
+  color:#20112f;
+}
+
+h1,h2,h3,p { margin-top:0; }
+
+h1 { font-size:19px;margin-bottom:2px; }
+
+.brand small {
+  color:var(--muted);
+  letter-spacing:2px;
+  font-size:10px;
+}
+
+header button { font-size:12px;padding:10px; }
+
+.hero { padding:48px 0 26px; }
+
+.eyebrow {
+  color:var(--cyan);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:11px;
+  font-weight:800;
+}
+
+.hero h2 {
+  font-size:clamp(38px,7vw,68px);
+  letter-spacing:-2px;
+  line-height:1.02;
+  margin:14px 0;
+}
+
+.gradient {
+  background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));
+  background-clip:text;
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero p {
+  color:var(--muted);
+  max-width:600px;
+  line-height:1.7;
+}
+
+.actions { display:flex;gap:9px;flex-wrap:wrap;margin-top:20px; }
+
+.stats,.games,.columns { display:grid;gap:13px; }
+
+.stats { grid-template-columns:repeat(3,1fr);margin:16px 0 36px; }
+
+.stat,.panel,.game {
+  border:1px solid var(--line);
+  background:#1b1530ef;
+  border-radius:19px;
+  padding:17px;
+}
+
+.stat strong { display:block;font-size:24px; }
+.stat span { font-size:12px;color:var(--muted); }
+
+section { margin:35px 0; }
+
+.heading { margin-bottom:16px; }
+
+.heading h3,.panel h3 { font-size:23px;margin-bottom:5px; }
+
+.heading p,.muted {
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+.games { grid-template-columns:repeat(3,minmax(0,1fr)); }
+
+.game {
+  min-height:205px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  background:linear-gradient(145deg,#29203f,#19132c);
+}
+
+.game .emoji { font-size:27px;margin-bottom:10px; }
+.game h3 { font-size:17px;margin-bottom:7px; }
+.game p { font-size:13px;line-height:1.5;color:var(--muted);flex:1; }
+.game button { font-size:12px; }
+
+.columns { grid-template-columns:1fr 1fr; }
+
+.field { display:flex;flex-direction:column;gap:7px;margin:13px 0; }
+.field label { font-size:12px;color:var(--muted); }
+
+input,select {
+  width:100%;
+  padding:12px;
+  background:#100c20;
+  color:white;
+  border:1px solid var(--line);
+  border-radius:11px;
+}
+
+.panel>button { margin-top:5px; }
+
+#message {
+  position:fixed;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#f3eaff;
+  color:#211331;
+  padding:12px 17px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+  display:none;
+  z-index:20;
+  width:max-content;
+  max-width:90%;
+  box-shadow:0 8px 30px #0008;
+  overflow-wrap:anywhere;
+}
+
+#auth {
+  max-width:480px;
+  margin:28px auto;
+  scroll-margin-top:20px;
+}
+
+#auth.hidden,.hidden { display:none!important; }
+
+#auth .panel { padding:22px; }
+
+#auth button {
+  margin:5px 5px 0 0;
+}
+
+.listrow {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  background:#ffffff08;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin:8px 0;
+  overflow-wrap:anywhere;
+}
+
+.small { font-size:12px;color:var(--muted); }
+
+#gamebox {
+  position:fixed;
+  inset:0;
+  background:#080511ef;
+  z-index:15;
+  display:grid;
+  place-items:center;
+  padding:14px;
+}
+
+#gamebox.hidden { display:none; }
+
+.game-modal {
+  width:min(550px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#1b1530;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+}
+
+.game-modal h2 { font-size:25px; }
+
+#question {
+  font-size:23px;
+  line-height:1.35;
+  font-weight:800;
+  margin:22px 0;
+}
+
+#options { display:grid;gap:10px; }
+
+#options button {
+  text-align:left;
+  background:var(--panel2);
+  color:white;
+  border:1px solid var(--line);
+}
+
+footer {
+  border-top:1px solid var(--line);
+  padding:24px 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+@media(max-width:700px) {
+  .games { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .columns { grid-template-columns:1fr; }
+  .hero { padding-top:32px; }
+}
+
+@media(max-width:430px) {
+  .games { gap:8px; }
+  .game { padding:12px;min-height:220px; }
+  .game h3 { font-size:15px; }
+  .game p { font-size:12px; }
+  .stats { gap:7px; }
+  .stat { padding:11px; }
+  .stat strong { font-size:20px; }
+  .hero h2 { font-size:42px; }
+}
 </style>
 </head>
+
 <body>
 <div class="wrap">
+
 <header>
-  <div class="brand"><div class="logo">✦</div><div><h1>We Outsideee</h1><small>FRIENDSHIP ARENA</small></div></div>
-  <button id="authButton" onclick="showAuth()">Sign in</button>
+  <div class="brand">
+    <div class="logo">✦</div>
+    <div>
+      <h1>We Outsideee</h1>
+      <small>FRIENDSHIP ARENA</small>
+    </div>
+  </div>
+  <button id="authButton" type="button">Sign in</button>
 </header>
 
 <main id="main">
@@ -78,8 +315,8 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
   <h2>Friendship is a<br><span class="gradient">competitive sport.</span></h2>
   <p>Find out who knows you best, expose the group chat secrets, and turn an ordinary hangout into legendary memories.</p>
   <div class="actions">
-    <button onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">Explore games ↓</button>
-    <button class="secondary" onclick="document.querySelector('#rooms').scrollIntoView({behavior:'smooth'})">Create a room +</button>
+    <button type="button" onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">Explore games ↓</button>
+    <button type="button" class="secondary" onclick="document.querySelector('#rooms').scrollIntoView({behavior:'smooth'})">Create a room +</button>
   </div>
 </section>
 
@@ -90,38 +327,52 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 </div>
 
 <section id="games">
-  <div class="heading"><h3>Pick your poison 🎲</h3><p>Choose a game and get the squad involved.</p></div>
+  <div class="heading">
+    <h3>Pick your poison 🎲</h3>
+    <p>Choose a game and get the squad involved.</p>
+  </div>
+
   <div class="games">
-    <article class="game"><div class="emoji">🧠</div><h3>Who Knows Me Best?</h3><p>Test how well your friends actually know you.</p><button onclick="play('who_knows_me_best')">Play now →</button></article>
-    <article class="game"><div class="emoji">⚖️</div><h3>Would You Rather</h3><p>Two choices. One questionable personality.</p><button onclick="play('would_you_rather')">Play now →</button></article>
-    <article class="game"><div class="emoji">🫣</div><h3>Truth or Dare</h3><p>Be honest or do something memorable.</p><button onclick="play('truth_or_dare')">Play now →</button></article>
-    <article class="game"><div class="emoji">🙋</div><h3>Never Have I Ever</h3><p>Find out who has been living a double life.</p><button onclick="play('never_have_i_ever')">Play now →</button></article>
-    <article class="game"><div class="emoji">💞</div><h3>Friendship Quiz</h3><p>Questions that put your friendship to the test.</p><button onclick="play('friendship_quiz')">Play now →</button></article>
-    <article class="game"><div class="emoji">🌪️</div><h3>Random Chaos</h3><p>Random prompts for the most unserious friend.</p><button onclick="play('random_chaos')">Play now →</button></article>
+    <article class="game"><div class="emoji">🧠</div><h3>Who Knows Me Best?</h3><p>Test how well your friends actually know you.</p><button type="button" onclick="play('who_knows_me_best')">Play now →</button></article>
+    <article class="game"><div class="emoji">⚖️</div><h3>Would You Rather</h3><p>Two choices. One questionable personality.</p><button type="button" onclick="play('would_you_rather')">Play now →</button></article>
+    <article class="game"><div class="emoji">🫣</div><h3>Truth or Dare</h3><p>Be honest or do something memorable.</p><button type="button" onclick="play('truth_or_dare')">Play now →</button></article>
+    <article class="game"><div class="emoji">🙋</div><h3>Never Have I Ever</h3><p>Find out who has been living a double life.</p><button type="button" onclick="play('never_have_i_ever')">Play now →</button></article>
+    <article class="game"><div class="emoji">💞</div><h3>Friendship Quiz</h3><p>Questions that put your friendship to the test.</p><button type="button" onclick="play('friendship_quiz')">Play now →</button></article>
+    <article class="game"><div class="emoji">🌪️</div><h3>Random Chaos</h3><p>Random prompts for the most unserious friend.</p><button type="button" onclick="play('random_chaos')">Play now →</button></article>
   </div>
 </section>
 
 <section id="rooms">
-  <div class="heading"><h3>Squad lobby 🛋️</h3><p>Create a shared room or join your friend's room using a code.</p></div>
+  <div class="heading">
+    <h3>Squad lobby 🛋️</h3>
+    <p>Create a shared room or join your friend's room using a code.</p>
+  </div>
+
   <div class="columns">
     <div class="panel">
-      <h3>Create a room</h3><p class="muted">Sign in first to create a room and share its code.</p>
-      <div class="field"><label>Room name</label><input id="roomName" placeholder="Friday Night Chaos" maxlength="40"></div>
-      <div class="field"><label>Game</label><select id="roomGame">
-        <option value="who_knows_me_best">Who Knows Me Best?</option>
-        <option value="would_you_rather">Would You Rather</option>
-        <option value="truth_or_dare">Truth or Dare</option>
-        <option value="never_have_i_ever">Never Have I Ever</option>
-        <option value="friendship_quiz">Friendship Quiz</option>
-        <option value="random_chaos">Random Chaos</option>
-      </select></div>
-      <button onclick="createRoom()">Create room</button>
+      <h3>Create a room</h3>
+      <p class="muted">Sign in first to create a room and share its code.</p>
+      <div class="field"><label for="roomName">Room name</label><input id="roomName" placeholder="Friday Night Chaos" maxlength="40"></div>
+      <div class="field">
+        <label for="roomGame">Game</label>
+        <select id="roomGame">
+          <option value="who_knows_me_best">Who Knows Me Best?</option>
+          <option value="would_you_rather">Would You Rather</option>
+          <option value="truth_or_dare">Truth or Dare</option>
+          <option value="never_have_i_ever">Never Have I Ever</option>
+          <option value="friendship_quiz">Friendship Quiz</option>
+          <option value="random_chaos">Random Chaos</option>
+        </select>
+      </div>
+      <button type="button" onclick="createRoom()">Create room</button>
       <div id="createdRoom"></div>
     </div>
+
     <div class="panel">
-      <h3>Join a room</h3><p class="muted">Enter the code your friend shared.</p>
-      <div class="field"><label>Room code</label><input id="joinCode" placeholder="ABC123" maxlength="8" style="text-transform:uppercase"></div>
-      <button class="secondary" onclick="joinRoom()">Join the squad →</button>
+      <h3>Join a room</h3>
+      <p class="muted">Enter the code your friend shared.</p>
+      <div class="field"><label for="joinCode">Room code</label><input id="joinCode" placeholder="ABC123" maxlength="8" style="text-transform:uppercase"></div>
+      <button type="button" class="secondary" onclick="joinRoom()">Join the squad →</button>
       <div id="currentRoom"></div>
     </div>
   </div>
@@ -129,51 +380,91 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 
 <section>
   <div class="columns">
-    <div class="panel"><h3>Your player profile 👤</h3><div id="profile" class="muted">Sign in to create your profile.</div></div>
-    <div class="panel"><h3>Leaderboard 🏆</h3><div id="leaderboard" class="muted">Sign in to see scores.</div></div>
+    <div class="panel">
+      <h3>Your player profile 👤</h3>
+      <div id="profile" class="muted">Sign in to create your profile.</div>
+    </div>
+    <div class="panel">
+      <h3>Leaderboard 🏆</h3>
+      <div id="leaderboard" class="muted">Sign in to see scores.</div>
+    </div>
   </div>
 </section>
 </main>
 
-<section id="auth" class="hidden">
+<section id="auth" class="hidden" aria-labelledby="authTitle">
   <div class="panel">
     <h3 id="authTitle">Welcome back 👋</h3>
     <p class="muted" id="authDescription">Sign in to enter the arena.</p>
-    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
-    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters"></div>
-    <div id="signupFields" class="hidden">
-      <div class="field"><label>Display name</label><input id="displayName" maxlength="30" placeholder="Your name"></div>
-      <div class="field"><label>Username</label><input id="username" maxlength="20" placeholder="chaoscaptain"></div>
-    </div>
-    <button id="authSubmit" onclick="submitAuth()">Sign in</button>
-    <button class="secondary" onclick="toggleAuthMode()" id="switchMode">Create an account</button>
-    <button class="secondary" onclick="hideAuth()">Cancel</button>
+
+    <form id="authForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+      </div>
+
+      <div id="signupFields" class="hidden">
+        <div class="field">
+          <label for="displayName">Display name</label>
+          <input id="displayName" maxlength="30" placeholder="Your name" autocomplete="nickname">
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" maxlength="20" placeholder="chaoscaptain" autocomplete="username">
+        </div>
+      </div>
+
+      <button id="authSubmit" type="submit">Sign in</button>
+      <button class="secondary" type="button" id="switchMode">Create an account</button>
+      <button class="secondary" type="button" id="cancelAuth">Cancel</button>
+    </form>
   </div>
 </section>
 
-<footer>© <span id="year"></span> We Outsideee · Friendship Arena · Made for the group chat that never sleeps ✦</footer>
+<footer>
+  © <span id="year"></span> We Outsideee · Friendship Arena · Made for the group chat that never sleeps ✦
+</footer>
 </div>
 
 <div id="gamebox" class="hidden">
   <div class="game-modal">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
       <div><div class="eyebrow">GAME ON</div><h2 id="gameTitle">Friendship game</h2></div>
-      <button class="secondary" onclick="closeGame()">✕</button>
+      <button class="secondary" type="button" onclick="closeGame()">✕</button>
     </div>
     <div id="progress" class="small"></div>
     <div id="question">Loading…</div>
     <div id="options"></div>
     <p id="feedback" class="muted"></p>
-    <button id="next" class="hidden" onclick="nextQuestion()">Next question →</button>
+    <button id="next" class="hidden" type="button" onclick="nextQuestion()">Next question →</button>
   </div>
 </div>
-<div id="message"></div>
+
+<div id="message" role="status" aria-live="polite"></div>
 
 <script>
-/* Public project URL and publishable key. Never put a service_role secret in browser code. */
+"use strict";
+
+/* Existing Supabase project: use only the public publishable key in browser code. */
 const SUPABASE_URL = "https://scacatgawfnwjizhqbyb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_efXxXreBvkuFOZdVh38BMA_DrRYjKzf";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let db = null;
+let user = null;
+let profile = null;
+let room = null;
+let gameType = null;
+let questions = [];
+let questionIndex = 0;
+let score = 0;
+let signupMode = false;
+let messageTimer = null;
+let authBusy = false;
 
 const titles = {
   who_knows_me_best:"Who Knows Me Best?",
@@ -222,240 +513,722 @@ const prompts = {
   ]
 };
 
-let user=null, profile=null, room=null, gameType=null, questions=[], questionIndex=0, score=0, signupMode=false;
-document.getElementById("year").textContent=new Date().getFullYear();
+/* General helpers */
+function $(id) {
+  return document.getElementById(id);
+}
 
-function notify(text){
-  const el=document.getElementById("message");
-  el.textContent=text;el.style.display="block";
-  clearTimeout(window.msgTimer);
-  window.msgTimer=setTimeout(()=>el.style.display="none",4000);
+function notify(message) {
+  const el = $("message");
+  if (!el) return;
+  el.textContent = String(message || "Something went wrong.");
+  el.style.display = "block";
+  clearTimeout(messageTimer);
+  messageTimer = setTimeout(() => {
+    el.style.display = "none";
+  }, 5000);
 }
-function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function showAuth(){document.getElementById("auth").classList.remove("hidden");document.getElementById("auth").scrollIntoView({behavior:"smooth"});}
-function hideAuth(){document.getElementById("auth").classList.add("hidden");}
-function toggleAuthMode(){
-  signupMode=!signupMode;
-  document.getElementById("signupFields").classList.toggle("hidden",!signupMode);
-  document.getElementById("authTitle").textContent=signupMode?"Join the squad ✨":"Welcome back 👋";
-  document.getElementById("authDescription").textContent=signupMode?"Create your player account.":"Sign in to enter the arena.";
-  document.getElementById("authSubmit").textContent=signupMode?"Create account":"Sign in";
-  document.getElementById("switchMode").textContent=signupMode?"I already have an account":"Create an account";
+
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
 }
-function updateAuthButton(){
-  const b=document.getElementById("authButton");
-  b.textContent=user?(profile?.display_name||user.email.split("@")[0]):"Sign in";
-  b.onclick=user?()=>document.getElementById("profile").scrollIntoView({behavior:"smooth"}):showAuth;
+
+function requireDatabase() {
+  if (!db) {
+    notify("Supabase could not load. Check your internet connection and refresh.");
+    return false;
+  }
+  return true;
 }
-async function submitAuth(){
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-  if(!email||password.length<6)return notify("Enter your email and a password with at least 6 characters.");
-  const b=document.getElementById("authSubmit");b.disabled=true;
-  try{
-    if(signupMode){
-      const display=document.getElementById("displayName").value.trim()||email.split("@")[0];
-      const username=(document.getElementById("username").value.trim()||email.split("@")[0]).toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
-      if(!username)throw Error("Choose a valid username.");
-      const {data,error}=await db.auth.signUp({email,password,options:{data:{display_name:display,username}}});
-      if(error)throw error;
-      if(data.session){
-        user=data.user;await saveProfile(display,username);await afterLogin();
+
+/* SIGN-IN FIX: use a direct event listener instead of inline onclick. */
+function showAuth() {
+  const section = $("auth");
+  if (!section) {
+    notify("Sign-in section was not found. Check index.html.");
+    return;
+  }
+
+  section.classList.remove("hidden");
+  section.scrollIntoView({ behavior:"smooth", block:"start" });
+
+  setTimeout(() => {
+    if (!user) $("email").focus({ preventScroll:true });
+  }, 350);
+}
+
+function hideAuth() {
+  $("auth").classList.add("hidden");
+}
+
+function toggleAuthMode() {
+  signupMode = !signupMode;
+
+  $("signupFields").classList.toggle("hidden", !signupMode);
+  $("authTitle").textContent = signupMode ? "Join the squad ✨" : "Welcome back 👋";
+  $("authDescription").textContent = signupMode
+    ? "Create your player account."
+    : "Sign in to enter the arena.";
+  $("authSubmit").textContent = signupMode ? "Create account" : "Sign in";
+  $("switchMode").textContent = signupMode
+    ? "I already have an account"
+    : "Create an account";
+
+  $("password").autocomplete = signupMode ? "new-password" : "current-password";
+}
+
+function updateAuthButton() {
+  const button = $("authButton");
+
+  if (user) {
+    button.textContent =
+      profile?.display_name ||
+      user.email?.split("@")[0] ||
+      "My profile";
+    button.onclick = () => $("profile").scrollIntoView({ behavior:"smooth" });
+  } else {
+    button.textContent = "Sign in";
+    button.onclick = showAuth;
+  }
+}
+
+/* Authentication */
+async function submitAuth(event) {
+  if (event) event.preventDefault();
+
+  if (authBusy) return;
+  if (!requireDatabase()) return;
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || password.length < 6) {
+    notify("Enter your email and a password with at least 6 characters.");
+    return;
+  }
+
+  const button = $("authSubmit");
+  authBusy = true;
+  button.disabled = true;
+  button.textContent = signupMode ? "Creating account…" : "Signing in…";
+
+  try {
+    if (signupMode) {
+      const display =
+        $("displayName").value.trim() || email.split("@")[0];
+
+      const username = (
+        $("username").value.trim() || email.split("@")[0]
+      ).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+
+      if (!username) throw Error("Choose a valid username.");
+
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name:display,
+            username:username
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        user = data.user;
+        await saveProfile(display, username);
+        await afterLogin();
         notify("Account created. Welcome to the arena!");
-      }else{
+      } else {
         notify("Account created! Check your email to confirm it, then sign in.");
-        toggleAuthMode();
+        if (!signupMode) toggleAuthMode();
+        else toggleAuthMode();
       }
-    }else{
-      const {data,error}=await db.auth.signInWithPassword({email,password});
-      if(error)throw error;
-      user=data.user;await afterLogin();notify("You're in. Let's play!");
+    } else {
+      const { data, error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      if (!data.user) throw Error("Sign-in did not return a user.");
+
+      user = data.user;
+      await afterLogin();
+      notify("You're in. Let's play!");
     }
-  }catch(e){notify(e.message||"Authentication failed.");}
-  finally{b.disabled=false;}
+  } catch (error) {
+    console.error("Authentication error:", error);
+    notify(error?.message || "Authentication failed. Please try again.");
+  } finally {
+    authBusy = false;
+    button.disabled = false;
+    button.textContent = signupMode ? "Create account" : "Sign in";
+  }
 }
-async function saveProfile(display,username){
-  if(!user)return;
-  const {error}=await db.from("game_profiles").upsert({
-    user_id:user.id,display_name:display,username:username
-  },{onConflict:"user_id"});
-  if(error)console.warn("Profile save:",error.message);
+
+async function saveProfile(display, username) {
+  if (!user || !db) return;
+
+  const { error } = await db.from("game_profiles").upsert({
+    user_id:user.id,
+    display_name:display,
+    username:username
+  }, { onConflict:"user_id" });
+
+  if (error) console.warn("Profile save:", error.message);
 }
-async function afterLogin(){
+
+async function afterLogin() {
   hideAuth();
   await loadProfile();
   await loadCounts();
   await loadLeaderboard();
   updateAuthButton();
 }
-async function loadProfile(){
-  if(!user)return;
-  const {data,error}=await db.from("game_profiles").select("*").eq("user_id",user.id).maybeSingle();
-  if(error)console.warn(error.message);
-  profile=data||{display_name:user.user_metadata?.display_name||user.email.split("@")[0],username:user.user_metadata?.username||user.email.split("@")[0]};
-  document.getElementById("profile").innerHTML=
-    `<div class="listrow"><div><strong>${safe(profile.display_name)}</strong><div class="small">@${safe(profile.username)}</div></div><button class="secondary" onclick="editProfile()">Edit</button></div>
-    <p class="small">Signed in as ${safe(user.email)}</p><button class="secondary" onclick="signOut()">Sign out</button>`;
+
+async function loadProfile() {
+  if (!user || !db) return;
+
+  const { data, error } = await db
+    .from("game_profiles")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) console.warn("Profile load:", error.message);
+
+  profile = data || {
+    display_name:user.user_metadata?.display_name || user.email?.split("@")[0] || "Player",
+    username:user.user_metadata?.username || user.email?.split("@")[0] || "player"
+  };
+
+  $("profile").innerHTML = `
+    <div class="listrow">
+      <div>
+        <strong>${safe(profile.display_name)}</strong>
+        <div class="small">@${safe(profile.username)}</div>
+      </div>
+      <button class="secondary" type="button" onclick="editProfile()">Edit</button>
+    </div>
+    <p class="small">Signed in as ${safe(user.email)}</p>
+    <button class="secondary" type="button" onclick="signOut()">Sign out</button>
+  `;
 }
-async function editProfile(){
-  const display=prompt("Display name:",profile?.display_name||"");if(display===null)return;
-  const username=prompt("Username:",profile?.username||"");if(username===null)return;
-  const clean=username.trim().toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
-  if(!clean)return notify("Enter a valid username.");
-  const {error}=await db.from("game_profiles").upsert({user_id:user.id,display_name:display.trim()||clean,username:clean},{onConflict:"user_id"});
-  if(error)return notify(error.message);
-  await loadProfile();await loadLeaderboard();updateAuthButton();notify("Profile updated.");
+
+async function editProfile() {
+  if (!user) return showAuth();
+
+  const display = prompt("Display name:", profile?.display_name || "");
+  if (display === null) return;
+
+  const username = prompt("Username:", profile?.username || "");
+  if (username === null) return;
+
+  const clean = username.trim().toLowerCase()
+    .replace(/[^a-z0-9_]/g, "").slice(0, 20);
+
+  if (!clean) return notify("Enter a valid username.");
+
+  const { error } = await db.from("game_profiles").upsert({
+    user_id:user.id,
+    display_name:display.trim() || clean,
+    username:clean
+  }, { onConflict:"user_id" });
+
+  if (error) return notify(error.message);
+
+  await loadProfile();
+  await loadLeaderboard();
+  updateAuthButton();
+  notify("Profile updated.");
 }
-async function signOut(){
-  await db.auth.signOut();user=null;profile=null;room=null;
-  document.getElementById("profile").textContent="Sign in to create your profile.";
-  document.getElementById("leaderboard").textContent="Sign in to see scores.";
-  document.getElementById("currentRoom").innerHTML="";
-  updateAuthButton();notify("Signed out.");
+
+async function signOut() {
+  if (!requireDatabase()) return;
+
+  const { error } = await db.auth.signOut();
+  if (error) return notify(error.message);
+
+  user = null;
+  profile = null;
+  room = null;
+
+  $("profile").textContent = "Sign in to create your profile.";
+  $("leaderboard").textContent = "Sign in to see scores.";
+  $("currentRoom").innerHTML = "";
+  $("createdRoom").innerHTML = "";
+
+  updateAuthButton();
+  notify("Signed out.");
 }
-function code(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join("");}
-async function createRoom(){
-  if(!user){notify("Sign in before creating a room.");showAuth();return;}
-  const name=document.getElementById("roomName").value.trim()||${profile?.display_name||"Squad"}'s room;
-  const type=document.getElementById("roomGame").value;
-  try{
-    let data,error;
-    for(let i=0;i<4;i++){
-      ({data,error}=await db.from("game_rooms").insert({room_name:name,join_code:code(),game_type:type,host_id:user.id,status:"waiting"}).select("*").single());
-      if(!error)break;
-      if(!/duplicate|unique/i.test(error.message))throw error;
+
+/* Rooms */
+function generateCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({ length:6 }, () =>
+    chars[Math.floor(Math.random() * chars.length)]
+  ).join("");
+}
+
+async function createRoom() {
+  if (!user) {
+    notify("Sign in before creating a room.");
+    showAuth();
+    return;
+  }
+
+  const name = $("roomName").value.trim() ||
+    ${profile?.display_name || "Squad"}'s room;
+  const type = $("roomGame").value;
+
+  try {
+    let data, error;
+
+    for (let i = 0; i < 4; i++) {
+      ({ data, error } = await db.from("game_rooms").insert({
+        room_name:name,
+        join_code:generateCode(),
+        game_type:type,
+        host_id:user.id,
+        status:"waiting"
+      }).select("*").single());
+
+      if (!error) break;
+      if (!/duplicate|unique/i.test(error.message)) throw error;
     }
-    if(error)throw error;
-    room=data;
+
+    if (error) throw error;
+
+    room = data;
     await addMember(room.id);
-    document.getElementById("createdRoom").innerHTML=<div class="listrow"><div><div class="small">SHARE THIS CODE</div><strong style="font-size:23px;letter-spacing:3px">${safe(room.join_code)}</strong></div><button onclick="copyCode()">Copy</button></div>;
-    renderRoom();await loadCounts();notify("Room created! Share the code with your friends.");
-  }catch(e){notify(e.message||"Could not create room.");}
+
+    $("createdRoom").innerHTML = `
+      <div class="listrow">
+        <div>
+          <div class="small">SHARE THIS CODE</div>
+          <strong style="font-size:23px;letter-spacing:3px">${safe(room.join_code)}</strong>
+        </div>
+        <button type="button" onclick="copyCode()">Copy</button>
+      </div>`;
+
+    renderRoom();
+    await loadCounts();
+    notify("Room created! Share the code with your friends.");
+  } catch (error) {
+    console.error("Create room:", error);
+    notify(error.message || "Could not create room.");
+  }
 }
-async function copyCode(){
-  if(!room)return;
-  try{await navigator.clipboard.writeText(room.join_code);notify("Room code copied!");}
-  catch{prompt("Copy your room code:",room.join_code);}
+
+async function copyCode() {
+  if (!room) return;
+
+  try {
+    await navigator.clipboard.writeText(room.join_code);
+    notify("Room code copied!");
+  } catch {
+    prompt("Copy your room code:", room.join_code);
+  }
 }
-async function joinRoom(){
-  if(!user){notify("Sign in before joining a room.");showAuth();return;}
-  const joinCode=document.getElementById("joinCode").value.trim().toUpperCase();
-  if(!joinCode)return notify("Enter a room code.");
-  try{
-    const {data,error}=await db.from("game_rooms").select("*").eq("join_code",joinCode).maybeSingle();
-    if(error)throw error;
-    if(!data)throw Error("Room not found. Check the code with your friend.");
-    if(data.status==="finished")throw Error("This room has finished.");
-    room=data;await addMember(room.id);renderRoom();notify("You joined "+room.room_name+"!");
-  }catch(e){notify(e.message||"Could not join room.");}
+
+async function joinRoom() {
+  if (!user) {
+    notify("Sign in before joining a room.");
+    showAuth();
+    return;
+  }
+
+  const joinCode = $("joinCode").value.trim().toUpperCase();
+  if (!joinCode) return notify("Enter a room code.");
+
+  try {
+    const { data, error } = await db.from("game_rooms")
+      .select("*")
+      .eq("join_code", joinCode)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw Error("Room not found. Check the code with your friend.");
+    if (data.status === "finished") throw Error("This room has finished.");
+
+    room = data;
+    await addMember(room.id);
+    renderRoom();
+    notify("You joined " + room.room_name + "!");
+  } catch (error) {
+    notify(error.message || "Could not join room.");
+  }
 }
-async function addMember(roomId){
-  if(!user)return;
-  const {error}=await db.from("game_room_members").upsert({room_id:roomId,user_id:user.id,score:0},{onConflict:"room_id,user_id",ignoreDuplicates:true});
-  if(error)console.warn("Membership:",error.message);
+
+async function addMember(roomId) {
+  if (!user) return;
+
+  const { error } = await db.from("game_room_members").upsert({
+    room_id:roomId,
+    user_id:user.id,
+    score:0
+  }, {
+    onConflict:"room_id,user_id",
+    ignoreDuplicates:true
+  });
+
+  if (error) console.warn("Membership:", error.message);
 }
-function renderRoom(){
-  if(!room)return;
-  document.getElementById("currentRoom").innerHTML=<div class="listrow"><div><strong>${safe(room.room_name)}</strong><div class="small">Code: ${safe(room.join_code)} · ${safe(titles[room.game_type]||room.game_type)}</div></div><button onclick="play('${safe(room.game_type)}')">Play →</button></div>;
+
+function renderRoom() {
+  if (!room) return;
+
+  $("currentRoom").innerHTML = `
+    <div class="listrow">
+      <div>
+        <strong>${safe(room.room_name)}</strong>
+        <div class="small">Code: ${safe(room.join_code)} · ${safe(titles[room.game_type] || room.game_type)}</div>
+      </div>
+      <button type="button" onclick="play('${safe(room.game_type)}')">Play →</button>
+    </div>`;
 }
-async function loadCounts(){
-  const [r,p]=await Promise.all([
-    db.from("game_rooms").select("*",{count:"exact",head:true}).neq("status","finished"),
-    db.from("game_profiles").select("*",{count:"exact",head:true})
-  ]);
-  document.getElementById("roomCount").textContent=r.error?"—":(r.count??0);
-  document.getElementById("playerCount").textContent=p.error?"—":(p.count??0);
+
+async function loadCounts() {
+  if (!db) return;
+
+  try {
+    const [rooms, players] = await Promise.all([
+      db.from("game_rooms")
+        .select("*", { count:"exact", head:true })
+        .neq("status", "finished"),
+      db.from("game_profiles")
+        .select("*", { count:"exact", head:true })
+    ]);
+
+    $("roomCount").textContent = rooms.error ? "—" : (rooms.count ?? 0);
+    $("playerCount").textContent = players.error ? "—" : (players.count ?? 0);
+  } catch (error) {
+    console.warn("Counts:", error);
+  }
 }
-async function loadLeaderboard(){
-  const el=document.getElementById("leaderboard");
-  if(!user){el.textContent="Sign in to see scores.";return;}
-  try{
-    const {data:members,error}=await db.from("game_room_members").select("user_id,score").order("score",{ascending:false}).limit(100);
-    if(error)throw error;
-    if(!members?.length){el.innerHTML='<p class="muted">No scores yet. Play a game to get started!</p>';return;}
-    const totals={};members.forEach(m=>totals[m.user_id]=(totals[m.user_id]||0)+(Number(m.score)||0));
-    const ids=Object.keys(totals).sort((a,b)=>totals[b]-totals[a]).slice(0,8);
-    const {data:people,error:e2}=await db.from("game_profiles").select("user_id,display_name,username").in("user_id",ids);
-    if(e2)throw e2;
-    const byId=Object.fromEntries((people||[]).map(p=>[p.user_id,p]));
-    el.innerHTML=ids.map((id,i)=><div class="listrow"><div><strong>${i+1}. ${safe(byId[id]?.display_name||byId[id]?.username||"Player")}</strong><div class="small">@${safe(byId[id]?.username||"player")}</div></div><strong>${totals[id]} pts</strong></div>).join("");
-  }catch(e){el.innerHTML=<p class="muted">Leaderboard couldn't load: ${safe(e.message)}</p>;}
-}
-async function play(type){
-  if(!user){notify("Sign in to play and save your score.");showAuth();return;}
-  gameType=type;
-  try{
-    const {data,error}=await db.from("game_questions").select("id,game_type,question,option_a,option_b,difficulty").eq("game_type",type).limit(60);
-    if(error)throw error;
-    questions=(data||[]).filter(q=>q.question);
-    if(!questions.length)questions=(prompts[type]||prompts.random_chaos).map((q,i)=>({id:null,game_type:type,question:q[0],option_a:q[1],option_b:q[2],fallback_index:i}));
-    questions.sort(()=>Math.random()-.5);
-    if(!room){
-      const {data:newRoom,error:roomError}=await db.from("game_rooms").insert({room_name:${profile?.display_name||"Player"}'s game,join_code:code(),game_type:type,host_id:user.id,status:"playing"}).select("*").single();
-      if(!roomError){room=newRoom;await addMember(room.id);renderRoom();}
-      else console.warn("Couldn't create solo room:",roomError.message);
+
+async function loadLeaderboard() {
+  const el = $("leaderboard");
+
+  if (!user) {
+    el.textContent = "Sign in to see scores.";
+    return;
+  }
+
+  try {
+    const { data:members, error } = await db.from("game_room_members")
+      .select("user_id,score")
+      .order("score", { ascending:false })
+      .limit(100);
+
+    if (error) throw error;
+
+    if (!members?.length) {
+      el.innerHTML = '<p class="muted">No scores yet. Play a game to get started!</p>';
+      return;
     }
-    questionIndex=0;score=0;
-    document.getElementById("gameTitle").textContent=titles[type]||"Friendship game";
-    document.getElementById("gamebox").classList.remove("hidden");
-    showQuestion();
-  }catch(e){notify(e.message||"Could not load game questions.");}
+
+    const totals = {};
+    members.forEach(member => {
+      totals[member.user_id] =
+        (totals[member.user_id] || 0) + (Number(member.score) || 0);
+    });
+
+    const ids = Object.keys(totals)
+      .sort((a,b) => totals[b] - totals[a])
+      .slice(0,8);
+
+    const { data:people, error:peopleError } = await db.from("game_profiles")
+      .select("user_id,display_name,username")
+      .in("user_id", ids);
+
+    if (peopleError) throw peopleError;
+
+    const byId = Object.fromEntries(
+      (people || []).map(person => [person.user_id, person])
+    );
+
+    el.innerHTML = ids.map((id, index) => `
+      <div class="listrow">
+        <div>
+          <strong>${index + 1}. ${safe(byId[id]?.display_name || byId[id]?.username || "Player")}</strong>
+          <div class="small">@${safe(byId[id]?.username || "player")}</div>
+        </div>
+        <strong>${totals[id]} pts</strong>
+      </div>`).join("");
+  } catch (error) {
+    el.innerHTML = <p class="muted">Leaderboard couldn't load: ${safe(error.message)}</p>;
+  }
 }
-function showQuestion(){
-  const q=questions[questionIndex];
-  if(!q)return finishGame();
-  document.getElementById("progress").textContent=Question ${questionIndex+1} of ${questions.length};
-  document.getElementById("question").textContent=q.question;
-  document.getElementById("options").innerHTML=<button onclick="answer(0)">${safe(q.option_a||"Option A")}</button><button onclick="answer(1)">${safe(q.option_b||"Option B")}</button>;
-  document.getElementById("feedback").textContent="Choose an option. Keep the dares fun, safe, and respectful.";
-  const next=document.getElementById("next");next.classList.add("hidden");next.textContent="Next question →";next.onclick=nextQuestion;
-}
-async function answer(choice){
-  const q=questions[questionIndex];
-  document.querySelectorAll("#options button").forEach(b=>b.disabled=true);
-  const response=choice===0?(q.option_a||"Option A"):(q.option_b||"Option B");
-  score++;
-  document.getElementById("feedback").textContent=You chose: ${response}. +1 point for playing!;
-  try{
-    if(room&&q.id){
-      const {error}=await db.from("game_answers").insert({room_id:room.id,question_id:q.id,user_id:user.id,answer:response,points:1});
-      if(error)console.warn("Answer wasn't saved:",error.message);
+
+/* Games */
+async function play(type) {
+  if (!user) {
+    notify("Sign in to play and save your score.");
+    showAuth();
+    return;
+  }
+
+  if (!titles[type]) {
+    notify("That game could not be found.");
+    return;
+  }
+
+  gameType = type;
+
+  try {
+    const { data, error } = await db.from("game_questions")
+      .select("id,game_type,question,option_a,option_b,difficulty")
+      .eq("game_type", type)
+      .limit(60);
+
+    if (error) throw error;
+
+    questions = (data || []).filter(question => question.question);
+
+    if (!questions.length) {
+      questions = (prompts[type] || prompts.random_chaos).map((item,index) => ({
+        id:null,
+        game_type:type,
+        question:item[0],
+        option_a:item[1],
+        option_b:item[2],
+        fallback_index:index
+      }));
     }
-    if(room){
-      const {data:member,error}=await db.from("game_room_members").select("score").eq("room_id",room.id).eq("user_id",user.id).maybeSingle();
-      if(!error&&member){
-        const {error:updateError}=await db.from("game_room_members").update({score:(Number(member.score)||0)+1}).eq("room_id",room.id).eq("user_id",user.id);
-        if(updateError)console.warn("Score wasn't updated:",updateError.message);
+
+    questions.sort(() => Math.random() - 0.5);
+
+    if (!room) {
+      const { data:newRoom, error:roomError } = await db.from("game_rooms")
+        .insert({
+          room_name:${profile?.display_name || "Player"}'s game,
+          join_code:generateCode(),
+          game_type:type,
+          host_id:user.id,
+          status:"playing"
+        })
+        .select("*")
+        .single();
+
+      if (!roomError) {
+        room = newRoom;
+        await addMember(room.id);
+        renderRoom();
+      } else {
+        console.warn("Couldn't create solo room:", roomError.message);
       }
     }
-  }catch(e){console.warn(e);}
-  const next=document.getElementById("next");next.classList.remove("hidden");
-  if(questionIndex===questions.length-1)next.textContent="See results →";
-}
-function nextQuestion(){questionIndex++;if(questionIndex>=questions.length){finishGame();return;}showQuestion();}
-async function finishGame(){
-  document.getElementById("progress").textContent="ROUND COMPLETE";
-  document.getElementById("question").textContent=You earned ${score} points! 🎉;
-  document.getElementById("options").innerHTML="";
-  document.getElementById("feedback").textContent="Invite the squad for another round!";
-  const next=document.getElementById("next");next.classList.remove("hidden");next.textContent="Play again ↻";next.onclick=()=>play(gameType);
-  await loadLeaderboard();await loadCounts();
-}
-function closeGame(){document.getElementById("gamebox").classList.add("hidden");}
 
-db.auth.onAuthStateChange((event,session)=>{
-  if(event==="SIGNED_OUT"){user=null;profile=null;room=null;updateAuthButton();}
-  if(event==="SIGNED_IN"&&session?.user){user=session.user;setTimeout(()=>afterLogin().catch(console.error),0);}
-});
-async function init(){
-  try{
-    const {data,error}=await db.auth.getSession();
-    if(error)throw error;
-    if(data.session?.user){user=data.session.user;await afterLogin();}
-    else{updateAuthButton();await loadCounts();}
-  }catch(e){notify("Supabase connection issue: "+e.message);}
+    questionIndex = 0;
+    score = 0;
+
+    $("gameTitle").textContent = titles[type];
+    $("gamebox").classList.remove("hidden");
+    showQuestion();
+  } catch (error) {
+    console.error("Start game:", error);
+    notify(error.message || "Could not load game questions.");
+  }
 }
-init();
+
+function showQuestion() {
+  const question = questions[questionIndex];
+  if (!question) return finishGame();
+
+  $("progress").textContent =
+    Question ${questionIndex + 1} of ${questions.length};
+  $("question").textContent = question.question;
+
+  $("options").innerHTML = `
+    <button type="button" onclick="answer(0)">${safe(question.option_a || "Option A")}</button>
+    <button type="button" onclick="answer(1)">${safe(question.option_b || "Option B")}</button>`;
+
+  $("feedback").textContent =
+    "Choose an option. Keep the dares fun, safe, and respectful.";
+
+  const next = $("next");
+  next.classList.add("hidden");
+  next.textContent = "Next question →";
+  next.onclick = nextQuestion;
+}
+
+async function answer(choice) {
+  const question = questions[questionIndex];
+  if (!question) return;
+
+  document.querySelectorAll("#options button").forEach(button => {
+    button.disabled = true;
+  });
+
+  const response = choice === 0
+    ? (question.option_a || "Option A")
+    : (question.option_b || "Option B");
+
+  score++;
+  $("feedback").textContent = You chose: ${response}. +1 point for playing!;
+
+  try {
+    if (room && question.id) {
+      const { error } = await db.from("game_answers").insert({
+        room_id:room.id,
+        question_id:question.id,
+        user_id:user.id,
+        answer:response,
+        points:1
+      });
+
+      if (error) console.warn("Answer wasn't saved:", error.message);
+    }
+
+    if (room) {
+      const { data:member, error } = await db.from("game_room_members")
+        .select("score")
+        .eq("room_id", room.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!error && member) {
+        const { error:updateError } = await db.from("game_room_members")
+          .update({ score:(Number(member.score) || 0) + 1 })
+          .eq("room_id", room.id)
+          .eq("user_id", user.id);
+
+        if (updateError) console.warn("Score wasn't updated:", updateError.message);
+      }
+    }
+  } catch (error) {
+    console.warn("Answer saving:", error);
+  }
+
+  const next = $("next");
+  next.classList.remove("hidden");
+
+  if (questionIndex === questions.length - 1) {
+    next.textContent = "See results →";
+  }
+}
+
+function nextQuestion() {
+  questionIndex++;
+
+  if (questionIndex >= questions.length) {
+    finishGame();
+    return;
+  }
+
+  showQuestion();
+}
+
+async function finishGame() {
+  $("progress").textContent = "ROUND COMPLETE";
+  $("question").textContent = You earned ${score} points! 🎉;
+  $("options").innerHTML = "";
+  $("feedback").textContent = "Invite the squad for another round!";
+
+  const next = $("next");
+  next.classList.remove("hidden");
+  next.textContent = "Play again ↻";
+  next.onclick = () => play(gameType);
+
+  await loadLeaderboard();
+  await loadCounts();
+}
+
+function closeGame() {
+  $("gamebox").classList.add("hidden");
+}
+
+/* Start the app only after the page has loaded. */
+async function init() {
+  $("year").textContent = new Date().getFullYear();
+
+  /* Attach sign-in handlers directly and explicitly. */
+  $("authButton").addEventListener("click", function(event) {
+    event.preventDefault();
+    if (user) {
+      $("profile").scrollIntoView({ behavior:"smooth" });
+    } else {
+      showAuth();
+    }
+  });
+
+  $("authForm").addEventListener("submit", submitAuth);
+  $("switchMode").addEventListener("click", toggleAuthMode);
+  $("cancelAuth").addEventListener("click", hideAuth);
+
+  $("joinCode").addEventListener("input", function() {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  });
+
+  window.addEventListener("error", function(event) {
+    console.error("Page error:", event.message);
+    notify("A website error occurred. Refresh the page and try again.");
+  });
+
+  window.addEventListener("unhandledrejection", function(event) {
+    console.error("Background error:", event.reason);
+  });
+
+  if (!window.supabase?.createClient) {
+    notify("Supabase failed to load. Check your internet connection and refresh.");
+    $("authButton").disabled = false;
+    return;
+  }
+
+  try {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        user = null;
+        profile = null;
+        room = null;
+        updateAuthButton();
+      }
+
+      if (event === "SIGNED_IN" && session?.user) {
+        user = session.user;
+        setTimeout(() => {
+          afterLogin().catch(error => {
+            console.error("Login setup:", error);
+            notify("Signed in, but some profile information could not load.");
+          });
+        }, 0);
+      }
+    });
+
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+
+    if (data.session?.user) {
+      user = data.session.user;
+      await afterLogin();
+    } else {
+      updateAuthButton();
+      await loadCounts();
+    }
+  } catch (error) {
+    console.error("App initialization:", error);
+    updateAuthButton();
+    notify("Connection issue: " + (error.message || "Unable to connect to Supabase."));
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
